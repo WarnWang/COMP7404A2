@@ -9,9 +9,10 @@
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/pacman/pacman.html
 
 import random
+import sys
 
 import util
-from game import Agent
+from game import Agent, Directions
 
 
 class ReflexAgent(Agent):
@@ -43,6 +44,8 @@ class ReflexAgent(Agent):
         chosen_index = random.choice(best_indices)  # Pick randomly among the best
 
         "Add more of your code here if you want to"
+        while legal_moves[chosen_index] == Directions.STOP and len(best_indices) > 1:
+            chosen_index = random.choice(best_indices)
 
         return legal_moves[chosen_index]
 
@@ -65,11 +68,47 @@ class ReflexAgent(Agent):
         successor_game_state = currentGameState.generatePacmanSuccessor(action)
         new_pos = successor_game_state.getPacmanPosition()
         new_food = successor_game_state.getFood()
-        new_ghost_states = successor_game_state.getGhostStates()
-        new_scared_times = [ghostState.scaredTimer for ghostState in new_ghost_states]
+        new_ghost = successor_game_state.getGhostStates()
 
         "*** YOUR CODE HERE ***"
-        return successor_game_state.getScore()
+        next_score = successor_game_state.getScore()
+        ghost_pos = successor_game_state.getGhostPositions()
+        for i in range(len(ghost_pos)):
+            distance = util.manhattanDistance(new_pos, ghost_pos[i])
+            if new_ghost[i].scaredTimer > 0:
+                next_score -= distance
+            else:
+                if distance < 2:
+                    return -sys.maxint
+                if distance > 5:
+                    next_score += 5
+                else:
+                    next_score += distance
+
+        if successor_game_state.isLose():
+            return -sys.maxint
+        elif successor_game_state.isWin():
+            return sys.maxint
+
+        food_list = new_food.asList()
+        next_pos = new_pos
+        if currentGameState.getFood()[new_pos[0]][new_pos[1]]:
+            next_score += 10
+        elif food_list:
+            length = util.manhattanDistance(food_list[0], next_pos)
+            food_pos = food_list[0]
+            for i in food_list:
+                new_length = util.manhattanDistance(i, next_pos)
+                if new_length < length:
+                    length = new_length
+                    food_pos = i
+            next_score -= length
+
+            food_list.pop(food_list.index(food_pos))
+        if action == Directions.STOP:
+            next_score -= 10
+
+        return next_score
 
 
 def scoreEvaluationFunction(currentGameState):
