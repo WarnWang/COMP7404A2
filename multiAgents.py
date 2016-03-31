@@ -8,9 +8,8 @@
 # Abbeel in Spring 2013.
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/pacman/pacman.html
 
-from util import manhattanDistance
-from game import Directions
-import random, util
+import random
+import util
 
 from game import Agent
 
@@ -68,6 +67,10 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        print newScaredTimes
+        print dir(newScaredTimes)
+        print newPos
+        print newFood
 
         "*** YOUR CODE HERE ***"
         return successorGameState.getScore()
