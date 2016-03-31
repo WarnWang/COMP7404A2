@@ -347,7 +347,8 @@ class Actions(object):
             dx, dy = vec
             next_y = y_int + dy
             next_x = x_int + dx
-            if not walls[next_x][next_y]: possible.append(dir)
+            if not walls[next_x][next_y]:
+                possible.append(dir)
 
         return possible
 
