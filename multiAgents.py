@@ -44,9 +44,6 @@ class ReflexAgent(Agent):
         chosen_index = random.choice(best_indices)  # Pick randomly among the best
 
         "Add more of your code here if you want to"
-        while legal_moves[chosen_index] == Directions.STOP and len(best_indices) > 1:
-            chosen_index = random.choice(best_indices)
-
         return legal_moves[chosen_index]
 
     def evaluationFunction(self, currentGameState, action):
@@ -69,44 +66,54 @@ class ReflexAgent(Agent):
         new_pos = successor_game_state.getPacmanPosition()
         new_food = successor_game_state.getFood()
         new_ghost = successor_game_state.getGhostStates()
+        ghost_pos = successor_game_state.getGhostPositions()
 
         "*** YOUR CODE HERE ***"
-        next_score = successor_game_state.getScore()
-        ghost_pos = successor_game_state.getGhostPositions()
+        # If this is win state, return the maximum value
+        if successor_game_state.isWin():
+            return sys.maxint
+
+        # Hold negative position on stop, encourage agent to take other actions
+        if action == Directions.STOP:
+            next_score = 0
+        else:
+            next_score = 1
+
+        # Calculate the ghost related score
         for i in range(len(ghost_pos)):
             distance = util.manhattanDistance(new_pos, ghost_pos[i])
+
+            # which means ghost is eatable
             if new_ghost[i].scaredTimer > 0:
-                next_score -= distance
+                next_score += new_ghost[i].scaredTimer - distance
             else:
+
+                # This position is very dangerous, so use the minimal value to represent
                 if distance < 2:
                     return -sys.maxint
-                if distance > 5:
+
+                # encourage the agent keep away from ghost, regard distance larger than 5 as safe
+                elif distance > 5:
                     next_score += 5
                 else:
                     next_score += distance
 
-        if successor_game_state.isLose():
-            return -sys.maxint
-        elif successor_game_state.isWin():
-            return sys.maxint
-
+        # Calculate the food impact
         food_list = new_food.asList()
         next_pos = new_pos
+
+        # If new position has a food, add 10 score
         if currentGameState.getFood()[new_pos[0]][new_pos[1]]:
             next_score += 10
+
+        # Else find the nearest food position
         elif food_list:
             length = util.manhattanDistance(food_list[0], next_pos)
-            food_pos = food_list[0]
             for i in food_list:
                 new_length = util.manhattanDistance(i, next_pos)
                 if new_length < length:
                     length = new_length
-                    food_pos = i
             next_score -= length
-
-            food_list.pop(food_list.index(food_pos))
-        if action == Directions.STOP:
-            next_score -= 10
 
         return next_score
 
