@@ -9,8 +9,8 @@
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/pacman/pacman.html
 
 import random
-import util
 
+import util
 from game import Agent
 
 
@@ -34,17 +34,17 @@ class ReflexAgent(Agent):
         some Directions.X for some X in the set {North, South, West, East, Stop}
         """
         # Collect legal moves and successor states
-        legalMoves = gameState.getLegalActions()
+        legal_moves = gameState.getLegalActions()
 
         # Choose one of the best actions
-        scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
-        bestScore = max(scores)
-        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
+        scores = [self.evaluationFunction(gameState, action) for action in legal_moves]
+        best_score = max(scores)
+        best_indices = [index for index in range(len(scores)) if scores[index] == best_score]
+        chosen_index = random.choice(best_indices)  # Pick randomly among the best
 
         "Add more of your code here if you want to"
 
-        return legalMoves[chosenIndex]
+        return legal_moves[chosen_index]
 
     def evaluationFunction(self, currentGameState, action):
         """
@@ -62,18 +62,14 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
-        successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-        print newScaredTimes
-        print dir(newScaredTimes)
-        print newPos
-        print newFood
+        successor_game_state = currentGameState.generatePacmanSuccessor(action)
+        new_pos = successor_game_state.getPacmanPosition()
+        new_food = successor_game_state.getFood()
+        new_ghost_states = successor_game_state.getGhostStates()
+        new_scared_times = [ghostState.scaredTimer for ghostState in new_ghost_states]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        return successor_game_state.getScore()
 
 
 def scoreEvaluationFunction(currentGameState):
