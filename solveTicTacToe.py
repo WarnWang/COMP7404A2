@@ -6,7 +6,7 @@
 # Date: 1/4/2016
 
 
-PLAYERS = ("AI", "Your move")
+PLAYERS = [("Player1 move", "Player2 move"), ("AI", "Your move"), ("AI1", "AI2")]
 
 
 class ticTacToeGame(object):
@@ -20,6 +20,7 @@ class ticTacToeGame(object):
             'c': self.board_c
         }
         self.player_index = False
+        self.player_name = None
 
     def __str__(self):
         '''
@@ -82,11 +83,29 @@ class ticTacToeGame(object):
     def is_finish(self):
         return self.__is_finish('a') and self.__is_finish('b') and self.__is_finish('c')
 
+    def play(self, AI_num=0):
+        if AI_num > 2:
+            AI_num = 2
+
+        self.player_name = PLAYERS[AI_num]
+        while not self.is_finish():
+            player_name = self.player_name[int(self.player_index)]
+            print '{}:'.format(self.player_name[int(self.player_index)]),
+            if 'AI' in player_name:
+                pass
+            else:
+                action = raw_input()
+                while not self.is_valid_action(action):
+                    action = raw_input("Invalid action, please input again: ")
+            self.take_action(action)
+            print self
+
+            self.player_index = not self.player_index
+
+        player_name = self.player_name[int(self.player_index)]
+        print "{} wins".format(player_name.split(' ')[0])
+
 
 if __name__ == "__main__":
     test = ticTacToeGame()
-    test.take_action('B0')
-    test.take_action('A1')
-    test.take_action('A2')
-    test.take_action('A0')
-    print test
+    test.play()
