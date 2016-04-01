@@ -9,11 +9,12 @@
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/pacman/pacman.html
 
 import random
-import sys
 
 import util
 from game import Agent, Directions
 
+MAX_VALUE = 2 ** 16 - 1
+MIN_VALUE = 1 - 2 ** 16
 
 class ReflexAgent(Agent):
     """
@@ -71,7 +72,7 @@ class ReflexAgent(Agent):
         "*** YOUR CODE HERE ***"
         # If this is win state, return the maximum value
         if successor_game_state.isWin():
-            return sys.maxint
+            return MAX_VALUE
 
         # Hold negative position on stop, encourage agent to take other actions
         if action == Directions.STOP:
@@ -90,7 +91,7 @@ class ReflexAgent(Agent):
 
                 # This position is very dangerous, so use the minimal value to represent
                 if distance < 2:
-                    return -sys.maxint
+                    return MIN_VALUE
 
                 # encourage the agent keep away from ghost, regard distance larger than 5 as safe
                 elif distance > 5:
@@ -177,7 +178,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         # init some parameter for next steps
         possible_next_action_list = gameState.getLegalActions(0)
-        max_value = -sys.maxint
+        max_value = MIN_VALUE
         next_action = Directions.STOP
         agent_num = gameState.getNumAgents()
 
@@ -224,8 +225,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         # Init some values
         possible_next_action_list = gameState.getLegalActions(agent_index)
-        min_value = sys.maxint
-        max_value = -sys.maxint
+        min_value = MAX_VALUE
+        max_value = MIN_VALUE
 
         for action in possible_next_action_list:
             next_state = gameState.generateSuccessor(agent_index, action)
