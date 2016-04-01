@@ -257,12 +257,113 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+        MultiAgentSearchAgent.__init__(self, evalFn, depth)
+
     def getAction(self, gameState):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        # init some parameter for next steps
+        possible_next_action_list = gameState.getLegalActions(0)
+        max_value = MIN_VALUE
+        next_action = Directions.STOP
+        agent_num = gameState.getNumAgents()
+
+        # get next agent index and next depth
+        if agent_num > 1:
+            next_agent = self.index + 1
+            depth = 0
+        else:
+            next_agent = self.index
+            depth = 1
+
+        # Travel all the possible actions to determine the best action
+        alpha = MIN_VALUE
+        beta = MAX_VALUE
+        for action in possible_next_action_list:
+            next_state = gameState.generateSuccessor(0, action)
+            if next_state.isWin():
+                return action
+            current_value = self.evaluate_actions(next_agent, depth, next_state, alpha, beta)
+            if current_value > max_value:
+                max_value = current_value
+                next_action = action
+            alpha = max(alpha, max_value)
+
+        return next_action
+
+    def evaluate_actions(self, agent_index, depth, game_state, alpha, beta):
+        '''
+        Evaluation function to calculate the action score
+        '''
+
+        # Check whether both Pacman or ghosts moving enough times or current state is a goal state
+        if depth == self.depth or game_state.isWin() or game_state.isLose():
+            return self.evaluationFunction(game_state)
+
+        if agent_index == self.index:
+            return self.max_value(game_state, depth, alpha, beta)
+        else:
+            return self.min_value(game_state, depth, agent_index, alpha, beta)
+
+    def max_value(self, game_state, depth, alpha, beta):
+
+        # Get the agent number
+        agent_num = game_state.getNumAgents()
+        possible_action_list = game_state.getLegalActions(0)
+        max_value = MIN_VALUE
+        if agent_num == 1:
+            next_agent = 0
+            next_depth = depth + 1
+        else:
+            next_agent = 1
+            next_depth = depth
+
+        for action in possible_action_list:
+            next_game_state = game_state.generateSuccessor(0, action)
+            if next_game_state.isWin() or next_game_state.isLose():
+                current_value = self.evaluationFunction(next_game_state)
+
+            else:
+                current_value = self.evaluate_actions(next_agent, next_depth, next_game_state, alpha, beta)
+
+            max_value = max(current_value, max_value)
+            if max_value > beta:
+                return max_value
+            alpha = max(alpha, max_value)
+
+        return max_value
+
+    def min_value(self, game_state, depth, agent_index, alpha, beta):
+
+        # Get the agent number
+        agent_num = game_state.getNumAgents()
+        possible_action_list = game_state.getLegalActions(agent_index)
+        min_value = MAX_VALUE
+        if agent_num == agent_index + 1:
+            next_agent = 0
+            next_depth = depth + 1
+        else:
+            next_agent = agent_index + 1
+            next_depth = depth
+
+        for action in possible_action_list:
+            next_game_state = game_state.generateSuccessor(agent_index, action)
+            if next_game_state.isWin() or next_game_state.isLose():
+                current_value = self.evaluationFunction(next_game_state)
+
+            else:
+                current_value = self.evaluate_actions(next_agent, next_depth, next_game_state, alpha, beta)
+
+            min_value = min(current_value, min_value)
+            if min_value < alpha:
+                return min_value
+            beta = min(beta, min_value)
+
+        return min_value
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
