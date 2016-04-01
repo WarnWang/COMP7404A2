@@ -11,6 +11,9 @@ PLAYERS = [("Player1 move", "Player2 move"), ("AI", "Your move"), ("AI1", "AI2")
 
 class ticTacToeGame(object):
     def __init__(self):
+        '''
+        init game only support 3 boards currently
+        '''
         self.board_a = [str(i) for i in range(9)]
         self.board_b = [str(i) for i in range(9)]
         self.board_c = [str(i) for i in range(9)]
@@ -81,9 +84,15 @@ class ticTacToeGame(object):
         return False
 
     def is_finish(self):
+        ''' Check whether game is finished or not '''
         return self.__is_finish('a') and self.__is_finish('b') and self.__is_finish('c')
 
     def play(self, AI_num=0):
+        '''
+        Play tic tac toe game
+        :param AI_num: the number of AI players, if this number greater than 2, regard as 2
+        :return: None
+        '''
         if AI_num > 2:
             AI_num = 2
 
