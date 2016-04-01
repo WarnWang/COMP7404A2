@@ -422,7 +422,83 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        # init some parameter for next steps
+        max_value = MIN_VALUE
+        next_action = Directions.STOP
+        if gameState.isLose() or gameState.isWin():
+            return next_action
+
+        possible_next_action_list = gameState.getLegalActions(0)
+        agent_num = gameState.getNumAgents()
+
+        # get next agent index and next depth
+        if agent_num > 1:
+            next_agent = self.index + 1
+            depth = 0
+        else:
+            next_agent = self.index
+            depth = 1
+
+        # Travel all the possible actions to determine the best action
+        for action in possible_next_action_list:
+            next_state = gameState.generateSuccessor(0, action)
+            if next_state.isWin():
+                return action
+            current_value = self.evaluate_actions(next_agent, depth, next_state)
+            if current_value > max_value:
+                max_value = current_value
+                next_action = action
+
+        return next_action
+
+    def evaluate_actions(self, agent_index, depth, gameState):
+        '''
+        Evaluation function to calculate the action score
+        '''
+
+        # Get the agent number
+        agent_num = gameState.getNumAgents()
+
+        # Check whether both Pacman or ghosts moving enough times or current state is a goal state
+        if depth == self.depth or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
+
+        # If all ghosts moved, next moved actor would be Pacman
+        elif agent_index == agent_num - 1:
+            depth += 1
+            next_agent_index = self.index
+
+        # Get next ghost agent index
+        else:
+            next_agent_index = agent_index + 1
+
+        # Init some values
+        possible_next_action_list = gameState.getLegalActions(agent_index)
+        max_value = MIN_VALUE
+        total_value = 0
+
+        for action in possible_next_action_list:
+            next_state = gameState.generateSuccessor(agent_index, action)
+
+            # if next_state is goal state, then there is no need to further evaluate
+            if next_state.isWin() or next_state.isLose():
+                current_value = self.evaluationFunction(next_state)
+
+            # Recursively calculate the state cost
+            else:
+                current_value = self.evaluate_actions(next_agent_index, depth, next_state)
+
+            # Update the max and total value
+            if current_value > max_value:
+                max_value = current_value
+            total_value += current_value
+
+        # If agent is Pacman, then it need the max_value, otherwise, it will need the average value
+        if agent_index == self.index:
+            return max_value
+        else:
+            return total_value / float(len(possible_next_action_list))
 
 
 def betterEvaluationFunction(currentGameState):
