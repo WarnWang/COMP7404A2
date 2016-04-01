@@ -297,24 +297,44 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
     def evaluate_actions(self, agent_index, depth, game_state, alpha, beta):
         '''
-        Evaluation function to calculate the action score
+        Evaluate the action performance
+        :param agent_index: the index of action that need to be evaluated
+        :param depth: how many depth has been explored
+        :param game_state: Current game state
+        :param alpha: Current alpha
+        :param beta: Current beta
+        :return: The score of current action
         '''
 
         # Check whether both Pacman or ghosts moving enough times or current state is a goal state
         if depth == self.depth or game_state.isWin() or game_state.isLose():
             return self.evaluationFunction(game_state)
 
-        if agent_index == self.index:
+        # Based on the agent type, decide which function should be used
+        if agent_index == 0:
             return self.max_value(game_state, depth, alpha, beta)
         else:
             return self.min_value(game_state, depth, agent_index, alpha, beta)
 
     def max_value(self, game_state, depth, alpha, beta):
+        '''
+        Function to evaluate the max agent
+        :param game_state: current game state
+        :param depth: current game depth
+        :param alpha: current alpha
+        :param beta: current beta
+        :return: current score
+        '''
 
         # Get the agent number
         agent_num = game_state.getNumAgents()
+
+        # We can make sure that this state is not the goal state, so Just generate successors directly
         possible_action_list = game_state.getLegalActions(0)
+
         max_value = MIN_VALUE
+
+        # Determine next agent and depth index
         if agent_num == 1:
             next_agent = 0
             next_depth = depth + 1
@@ -322,6 +342,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             next_agent = 1
             next_depth = depth
 
+        # Travel all possible states
         for action in possible_action_list:
             next_game_state = game_state.generateSuccessor(0, action)
             if next_game_state.isWin() or next_game_state.isLose():
@@ -331,18 +352,36 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 current_value = self.evaluate_actions(next_agent, next_depth, next_game_state, alpha, beta)
 
             max_value = max(current_value, max_value)
+
+            # If max value greater than beta, we can prune the following path
             if max_value > beta:
                 return max_value
+
+            # Get new alpha
             alpha = max(alpha, max_value)
 
         return max_value
 
     def min_value(self, game_state, depth, agent_index, alpha, beta):
+        '''
+        Function to evaluate the max agent
+        :param game_state: current game state
+        :param depth: current game depth
+        :param alpha: current alpha
+        :param beta: current beta
+        :param agent_index: The agent that need to be judged
+        :return: current score
+        '''
 
         # Get the agent number
         agent_num = game_state.getNumAgents()
+
+        # We can make sure that this state is not the goal state, so Just generate successors directly
         possible_action_list = game_state.getLegalActions(agent_index)
+
         min_value = MAX_VALUE
+
+        # Determine next agent and depth index
         if agent_num == agent_index + 1:
             next_agent = 0
             next_depth = depth + 1
@@ -350,6 +389,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             next_agent = agent_index + 1
             next_depth = depth
 
+        # Travel all possible states
         for action in possible_action_list:
             next_game_state = game_state.generateSuccessor(agent_index, action)
             if next_game_state.isWin() or next_game_state.isLose():
@@ -359,8 +399,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 current_value = self.evaluate_actions(next_agent, next_depth, next_game_state, alpha, beta)
 
             min_value = min(current_value, min_value)
+            # If max value greater than alpha, we can prune the following path
             if min_value < alpha:
                 return min_value
+
+            # get new beta
             beta = min(beta, min_value)
 
         return min_value
