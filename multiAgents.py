@@ -509,7 +509,47 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    if currentGameState.isWin() or currentGameState.isLose():
+        return currentGameState.getScore()
+    pacman_pos = currentGameState.getPacmanPosition()
+    ghost_pos = currentGameState.getGhostPositions()
+    ghost_state = currentGameState.getGhostStates()
+    current_value = currentGameState.getScore()
+
+    # Calculate the ghost related score
+    for i in range(len(ghost_pos)):
+        distance = util.manhattanDistance(pacman_pos, ghost_pos[i])
+
+        # which means ghost is eatable
+        if ghost_state[i].scaredTimer > 0:
+            current_value += ghost_state[i].scaredTimer - distance
+        else:
+
+            # This position is very dangerous, so use the minimal value to represent
+            if distance < 2:
+                return MIN_VALUE
+
+            # encourage the agent keep away from ghost, regard distance larger than 5 as safe
+            elif distance > 5:
+                current_value += 5
+            else:
+                current_value += distance
+
+    # Calculate the food impact
+    food_list = currentGameState.getFood().asList()
+
+    # Else find the nearest food position
+    if food_list:
+        length = util.manhattanDistance(food_list[0], pacman_pos)
+        for i in range(len(food_list)):
+            new_length = util.manhattanDistance(food_list[i], pacman_pos)
+            if new_length <= length:
+                length = new_length
+
+        current_value -= length
+        current_value -= len(food_list) * 8
+
+    return current_value
 
 
 # Abbreviation
