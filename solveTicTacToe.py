@@ -22,6 +22,10 @@ class ticTacToeGame(object):
         self.player_index = False
 
     def __str__(self):
+        '''
+        Use a string to represent current board
+        :return: the board string
+        '''
         string_info = "A:     B:     C:"
         row1 = " ".join(self.board_a[:3])
         row2 = " ".join(self.board_a[3:6])
@@ -33,19 +37,56 @@ class ticTacToeGame(object):
 
         return "{}\n{}\n{}\n{}".format(string_info, row1, row2, row3)
 
+    def is_valid_action(self, action_pos):
+        '''
+        Check whether current move is valid move
+        :param action_pos: the position that need to change to X
+        :return: whether this action is valid or not
+        '''
+        action_pos = action_pos.lower()
+        if len(action_pos) != 2:
+            return False
+        board_index = action_pos[0]
+        piece_index = action_pos[1]
+        if board_index not in 'abc' or not piece_index.isdigit() or piece_index == '9':
+            return False
+        if self.__is_finish(board_index) or self.board[board_index][int(piece_index)] == 'X':
+            return False
+        return True
+
     def take_action(self, position):
         position = position.lower()
-        if position[0] not in 'abc' or len(position) != 2 or not position[1].isdigit() or position[1] == '9':
+        if not self.is_valid_action(position):
             raise ValueError('Invalid action {}'.format(position))
         if self.board[position[0]][int(position[1])] != 'X':
             self.board[position[0]][int(position[1])] = 'X'
 
-    def is_finish(self, board='a'):
-        pass
+    def __is_finish(self, board='a'):
+        '''
+        internal function, check whether current board can add more piece or not
+        :param board: board index, possible values is 'a', 'b' or 'c'
+        :return: boolean, true or false
+        '''
+        board = self.board[board]
+        if board[4] == 'X':
+            pass
+        possible_lines = ['012', '345', '678', '036', '147', '258', '048', '246']
+        for i in possible_lines:
+            for j in i:
+                if j in board:
+                    break
+            else:
+                return True
+        return False
+
+    def is_finish(self):
+        return self.__is_finish('a') and self.__is_finish('b') and self.__is_finish('c')
 
 
 if __name__ == "__main__":
     test = ticTacToeGame()
     test.take_action('B0')
     test.take_action('A1')
+    test.take_action('A2')
+    test.take_action('A0')
     print test
