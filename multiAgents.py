@@ -195,24 +195,29 @@ class MinimaxAgent(MultiAgentSearchAgent):
             next_state = gameState.generateSuccessor(0, action)
             if next_state.isWin():
                 return action
-            current_value = self.evaluate_actions(next_agent, depth, next_state)
+            current_value = self.evaluate_action(next_agent, depth, next_state)
             if current_value > max_value:
                 max_value = current_value
                 next_action = action
 
         return next_action
 
-    def evaluate_actions(self, agent_index, depth, gameState):
+    def evaluate_action(self, agent_index, depth, game_state):
         '''
         Evaluation function to calculate the action score
+
+        :param agent_index: If agent index is 0, act as max_value, other wise min_value
+        :param depth: current depth
+        :param game_state: current game state
+        :return: the score of current action
         '''
 
         # Get the agent number
-        agent_num = gameState.getNumAgents()
+        agent_num = game_state.getNumAgents()
 
         # Check whether both Pacman or ghosts moving enough times or current state is a goal state
-        if depth == self.depth or gameState.isWin() or gameState.isLose():
-            return self.evaluationFunction(gameState)
+        if depth == self.depth or game_state.isWin() or game_state.isLose():
+            return self.evaluationFunction(game_state)
 
         # If all ghosts moved, next moved actor would be Pacman
         elif agent_index == agent_num - 1:
@@ -224,12 +229,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
             next_agent_index = agent_index + 1
 
         # Init some values
-        possible_next_action_list = gameState.getLegalActions(agent_index)
+        possible_next_action_list = game_state.getLegalActions(agent_index)
         min_value = MAX_VALUE
         max_value = MIN_VALUE
 
         for action in possible_next_action_list:
-            next_state = gameState.generateSuccessor(agent_index, action)
+            next_state = game_state.generateSuccessor(agent_index, action)
 
             # if next_state is goal state, then there is no need to further evaluate
             if next_state.isWin() or next_state.isLose():
@@ -237,7 +242,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
             # Recursively calculate the state cost
             else:
-                current_value = self.evaluate_actions(next_agent_index, depth, next_state)
+                current_value = self.evaluate_action(next_agent_index, depth, next_state)
 
             # Update the max and min value
             if current_value > max_value:
@@ -287,7 +292,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             next_state = gameState.generateSuccessor(0, action)
             if next_state.isWin():
                 return action
-            current_value = self.evaluate_actions(next_agent, depth, next_state, alpha, beta)
+            current_value = self.evaluate_action(next_agent, depth, next_state, alpha, beta)
             if current_value > max_value:
                 max_value = current_value
                 next_action = action
@@ -295,7 +300,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         return next_action
 
-    def evaluate_actions(self, agent_index, depth, game_state, alpha, beta):
+    def evaluate_action(self, agent_index, depth, game_state, alpha, beta):
         '''
         Evaluate the action performance
         :param agent_index: the index of action that need to be evaluated
@@ -349,7 +354,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 current_value = self.evaluationFunction(next_game_state)
 
             else:
-                current_value = self.evaluate_actions(next_agent, next_depth, next_game_state, alpha, beta)
+                current_value = self.evaluate_action(next_agent, next_depth, next_game_state, alpha, beta)
 
             max_value = max(current_value, max_value)
 
@@ -396,7 +401,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 current_value = self.evaluationFunction(next_game_state)
 
             else:
-                current_value = self.evaluate_actions(next_agent, next_depth, next_game_state, alpha, beta)
+                current_value = self.evaluate_action(next_agent, next_depth, next_game_state, alpha, beta)
 
             min_value = min(current_value, min_value)
             # If max value greater than alpha, we can prune the following path
@@ -445,24 +450,24 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             next_state = gameState.generateSuccessor(0, action)
             if next_state.isWin():
                 return action
-            current_value = self.evaluate_actions(next_agent, depth, next_state)
+            current_value = self.evaluate_action(next_agent, depth, next_state)
             if current_value > max_value:
                 max_value = current_value
                 next_action = action
 
         return next_action
 
-    def evaluate_actions(self, agent_index, depth, gameState):
+    def evaluate_action(self, agent_index, depth, game_state):
         '''
         Evaluation function to calculate the action score
         '''
 
         # Get the agent number
-        agent_num = gameState.getNumAgents()
+        agent_num = game_state.getNumAgents()
 
         # Check whether both Pacman or ghosts moving enough times or current state is a goal state
-        if depth == self.depth or gameState.isWin() or gameState.isLose():
-            return self.evaluationFunction(gameState)
+        if depth == self.depth or game_state.isWin() or game_state.isLose():
+            return self.evaluationFunction(game_state)
 
         # If all ghosts moved, next moved actor would be Pacman
         elif agent_index == agent_num - 1:
@@ -474,12 +479,12 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             next_agent_index = agent_index + 1
 
         # Init some values
-        possible_next_action_list = gameState.getLegalActions(agent_index)
+        possible_next_action_list = game_state.getLegalActions(agent_index)
         max_value = MIN_VALUE
         total_value = 0
 
         for action in possible_next_action_list:
-            next_state = gameState.generateSuccessor(agent_index, action)
+            next_state = game_state.generateSuccessor(agent_index, action)
 
             # if next_state is goal state, then there is no need to further evaluate
             if next_state.isWin() or next_state.isLose():
@@ -487,7 +492,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
             # Recursively calculate the state cost
             else:
-                current_value = self.evaluate_actions(next_agent_index, depth, next_state)
+                current_value = self.evaluate_action(next_agent_index, depth, next_state)
 
             # Update the max and total value
             if current_value > max_value:

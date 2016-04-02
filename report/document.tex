@@ -19,4 +19,10 @@
 	Normally, this evaluation function acts very good in "testClassic". But as I don't take wall into consideration, this function does not act so well in "mediumClassic"
 	\section{Minimax Agent}
 	\label{sec:Q2}
+	I first generate all the possible next actions that the agent can do, then use "evaluate\_function" to get the score of current action, then find the highest score, and return the action related to that score\\
+	I use recurse to achieve the evaluate\_actions, which needs 3 inputs, agent\_index, depth, game\_state. This single method can act as both min-value and max-value based on current agent index.\\
+	The problem of such agent is the speed of get action. In my Mac, for a "smallClassic" layout, when depth is set to 4, it usually takes 3 or 4 seconds to do one action. Besides, as the evaluation function is not so good, often, Pacman will remains stay if both ghosts and food are a little far away from it.
+	\section{Alpha-Beta Prune Agent}
+	\label{sec:Q3}
+	
 \end{document}
