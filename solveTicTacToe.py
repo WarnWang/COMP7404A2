@@ -5,7 +5,17 @@
 # File name: solveTicTacToe
 # Date: 1/4/2016
 
+"""
+Support any number of board, and both first player and second player can be set as AI.
+Default setting is player1 is AI, and there are 3 boards
 
+Enjoy it!
+
+Reference
+    (1) The Secrets of Notakto: Winning at X-only Tic-Tac-Toe http://arxiv.org/pdf/1301.1672v1.pdf
+"""
+
+# The following variables are used in evaluation board function
 P_POSITION = ['a', 'bb', 'bc', 'cc']
 Q = [1, 'a', 'b', 'ab', 'bb', 'abb', 'c', 'ac', 'bc', 'abc', 'cc', 'acc', 'bcc', 'abcc', 'd', 'ad', 'bd', 'abd']
 EVALUATE_BOARD_DICT = {
@@ -74,6 +84,7 @@ class GameBoard(object):
         return tuple(self.__board).__hash__()
 
     def copy(self):
+        ''' Get a copy of current board '''
         new_board = self.__board[:]
         return GameBoard(new_board)
 
@@ -93,6 +104,7 @@ class GameBoard(object):
         return not self.is_dead() and pos in range(9) and self.__board[pos] != 'X'
 
     def evaluate_board(self):
+        ''' Get the evaluation of current board '''
         if self.is_dead():
             return '1'
 
@@ -150,6 +162,11 @@ class GameBoard(object):
                 get_symmetry(board_270))
 
     def try_action(self, pos):
+        '''
+        Try to change pos to 'X' and return a new board
+        :param pos: pos index, must be in [0, 8]
+        :return: a new board with pos set to 'X'
+        '''
         if isinstance(pos, str):
             pos = int(pos)
         new_board = self.copy()
@@ -220,16 +237,17 @@ class TicTacToeGame(object):
                 return False
         return True
 
-    def play(self, ai_player1=False, ai_player2=False):
+    def play(self, player1_is_ai=True, player2_is_ai=False):
         '''
         Play tic tac toe game
-        :param ai_player1: the number of AI players, if this number greater than 2, regard as 2
+        :param player1_is_ai: Whether player1 is AI or not
+        :param player2_is_ai: Whether player2 is AI or not
         '''
-        if ai_player1 and ai_player2:
+        if player1_is_ai and player2_is_ai:
             players = [AIPlayer('AI1'), AIPlayer('AI2')]
-        elif ai_player2:
+        elif player2_is_ai:
             players = ['Your', AIPlayer('AI')]
-        elif ai_player1:
+        elif player1_is_ai:
             players = [AIPlayer('AI'), 'Your']
         else:
             players = ['Player1', 'Player2']
@@ -262,6 +280,7 @@ class AIPlayer(object):
         return self.__name
 
     def get_next_action(self, board):
+        ''' Use one step BFS solution to find the best action '''
         board_num = len(board)
         valid_action_list = [i.get_valid_action() for i in board]
         state_list = [i.evaluate_board() for i in board]
@@ -342,5 +361,5 @@ def analysis_state(state):
         return ''.join(state)
 
 if __name__ == "__main__":
-    test = TicTacToeGame(6)
-    test.play(False, True)
+    test = TicTacToeGame(1)
+    test.play(player1_is_ai=False, player2_is_ai=True)
