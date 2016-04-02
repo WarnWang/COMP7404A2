@@ -21,8 +21,13 @@
 	\label{sec:Q2}
 	I first generate all the possible next actions that the agent can do, then use "evaluate\_function" to get the score of current action, then find the highest score, and return the action related to that score\\
 	I use recurse to achieve the evaluate\_actions, which needs 3 inputs, agent\_index, depth, game\_state. This single method can act as both min-value and max-value based on current agent index.\\
-	The problem of such agent is the speed of get action. In my Mac, for a "smallClassic" layout, when depth is set to 4, it usually takes 3 or 4 seconds to do one action. Besides, as the evaluation function is not so good, often, Pacman will remains stay if both ghosts and food are a little far away from it.
+	The problem of such agent is the speed of get action. In my Mac, for a "smallClassic" layout, when depth is set to 4, it usually takes about 3 seconds to do one action. Besides, as the evaluation function is not so good, often, Pacman will remains stay if both ghosts and food are a little far away from it.
 	\section{Alpha-Beta Prune Agent}
 	\label{sec:Q3}
-	
+	The technique I used in this question is slightly different from that in section~\ref{sec:Q2},
+	\begin{enumerate}
+		\item \textbf{Evaluate-action function add alpha and beta parameters}. These two new parameters are used to prune those unused leaves.
+		\item \textbf{Use three functions to finish this recurse}. This makes the code much easier to read.
+	\end{enumerate}
+	This agent acts faster than Minimax Agent. If usually takes about 1.5 seconds to determine the action. However, in the same cases of that to Minimax Agent, this also choose to stay.
 \end{document}
