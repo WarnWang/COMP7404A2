@@ -12,7 +12,9 @@ Default setting is player1 is AI, and there are 3 boards
 Enjoy it!
 
 Reference
-    (1) The Secrets of Notakto: Winning at X-only Tic-Tac-Toe http://arxiv.org/pdf/1301.1672v1.pdf
+    (1) Plambeck, Thane E., and Greg Whitehead. "The Secrets of Notakto: Winning at X-only Tic-Tac-Toe." arXiv preprint
+    arXiv:1301.1672 (2013).
+
 """
 
 # The following variables are used in evaluation board function

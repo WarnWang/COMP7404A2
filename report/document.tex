@@ -30,4 +30,15 @@
 		\item \textbf{Use three functions to finish this recurse}. This makes the code much easier to read.
 	\end{enumerate}
 	This agent acts faster than Minimax Agent. If usually takes about 1.5 seconds to determine the action. However, in the same cases of that to Minimax Agent, this also choose to stay.
+	\section{Expectimax Agent}
+	\label{sec:Q4}
+	It is true that usually ghost just random walks, not an adversary who makes optimal decisions and sometimes Minimax agent choose wrong action. That's why we need Expectimax Agent, which will calculate the possibility of every enemy's action and choose the action with highest expect score.\\
+	The code of this agent looks much similar of that in section~\ref{sec:Q2}, the only difference is that instead of return min-value, it will return the average value of all actions.\\
+	This gives "trappedClassic" about 49.2\% winning rate (compares to 0\% of Minimax Agent)
+	\begin{thebibliography}{1}
+		\bibitem{winning_strategy} 
+		Plambeck, Thane E., and Greg Whitehead. 
+		\textit{The Secrets of Notakto: Winning at X-only Tic-Tac-Toe}. 
+		arXiv preprint arXiv:1301.1672. 2013 Jan 8.
+	\end{thebibliography}
 \end{document}
