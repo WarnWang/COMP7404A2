@@ -9,7 +9,35 @@
 PLAYERS = [("Player1 move", "Player2 move"), ("AI", "Your move"), ("AI1", "AI2")]
 
 
-class ticTacToeGame(object):
+class GameBoard(object):
+    ''' Use to store the date of current game board '''
+
+    def __init__(self):
+        self.__board = [str(i) for i in range(9)]
+
+    def __getitem__(self, item):
+        return self.__board[item]
+
+    def __setitem__(self, key, value):
+        self.__board[key] = value
+
+    def is_dead(self):
+        ''' Check whether current board can be played any more '''
+        possible_lines = ['012', '345', '678', '036', '147', '258', '048', '246']
+        for i in possible_lines:
+            for j in i:
+                if j in self.__board:
+                    break
+            else:
+                return True
+        return False
+
+    def is_valid_move(self, pos):
+        ''' Check whether current position can be set to X '''
+        return not self.is_dead() and pos in range(9) and self.__board[pos] != 'X'
+
+
+class TicTacToeGame(object):
     def __init__(self, board_num=3):
         '''
         init game only support 3 boards currently
@@ -17,7 +45,7 @@ class ticTacToeGame(object):
         self.board = []
         self.board_num = board_num
         for i in range(board_num):
-            self.board.append([str(i) for i in range(9)])
+            self.board.append(GameBoard())
         self.player_index = False
         self.player_name = None
 
@@ -53,11 +81,9 @@ class ticTacToeGame(object):
             return False
         board_index = ord(action_pos[0]) - ord('a')
         piece_index = action_pos[1]
-        if board_index > self.board_num or board_index < 0 or not piece_index.isdigit() or piece_index == '9':
+        if board_index >= self.board_num or board_index < 0 or not piece_index.isdigit() or piece_index == '9':
             return False
-        if self.__is_finish(self.board[board_index]) or self.board[board_index][int(piece_index)] == 'X':
-            return False
-        return True
+        return self.board[board_index].is_valid_move(int(piece_index))
 
     def take_action(self, position):
         position = position.lower()
@@ -67,29 +93,10 @@ class ticTacToeGame(object):
         board_index = ord(position[0]) - ord('a')
         self.board[board_index][int(position[1])] = 'X'
 
-    def __is_finish(self, board=None):
-        '''
-        internal function, check whether current board can add more piece or not
-        :param board: board index, possible values is 'a', 'b' or 'c'
-        :return: boolean, true or false
-        '''
-        if board is None:
-            return True
-        if board[4] == 'X':
-            pass
-        possible_lines = ['012', '345', '678', '036', '147', '258', '048', '246']
-        for i in possible_lines:
-            for j in i:
-                if j in board:
-                    break
-            else:
-                return True
-        return False
-
     def is_finish(self):
         ''' Check whether game is finished or not '''
         for board in self.board:
-            if not self.__is_finish(board):
+            if not board.is_dead():
                 return False
         return True
 
@@ -97,7 +104,6 @@ class ticTacToeGame(object):
         '''
         Play tic tac toe game
         :param AI_num: the number of AI players, if this number greater than 2, regard as 2
-        :return: None
         '''
         if AI_num > 2:
             AI_num = 2
@@ -122,5 +128,5 @@ class ticTacToeGame(object):
 
 
 if __name__ == "__main__":
-    test = ticTacToeGame(2)
+    test = TicTacToeGame(2)
     test.play()
