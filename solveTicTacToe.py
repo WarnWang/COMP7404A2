@@ -6,104 +6,20 @@
 # Date: 1/4/2016
 
 
-PLAYERS = [("Player1 move", "Player2 move"), ("AI", "Your move"), ("AI1", "AI2")]
 P_POSITION = ['a', 'bb', 'bc', 'cc']
 Q = [1, 'a', 'b', 'ab', 'bb', 'abb', 'c', 'ac', 'bc', 'abc', 'cc', 'acc', 'bcc', 'abcc', 'd', 'ad', 'bd', 'abd']
-EVALUATE_BOARD_DICT = {'1': ['X12345678',
-                             '0123X5678',
-                             'XXX345678',
-                             'X123X567X',
-                             'X1234X6X8',
-                             '0X23X56X8',
-                             'XXXX45678',
-                             'XXX3X5678',
-                             'XXX345X78',
-                             'XXX3456X8',
-                             'XX23X56X8',
-                             'XX23X567X',
-                             'X1X3X5X78',
-                             '0X2XXX678',
-                             'XXXXX5678',
-                             'XXXX4X678',
-                             'XXXX45X78',
-                             'XXXX456X8',
-                             'XXXX4567X',
-                             'XXX3X5X78',
-                             'XXX3X56X8',
-                             'XXX345XX8',
-                             'XXX345X7X',
-                             'XX2XXX678',
-                             'XX2XX567X',
-                             'XX23XX6X8',
-                             'XX23XX67X',
-                             'XX23X5XX8',
-                             'XX23X5X7X',
-                             'XX23X56XX',
-                             'X1X3X5X7X',
-                             '0X2XXX6X8',
-                             'XXXXXX678',
-                             'XXXXX5X78',
-                             'XXXXX56X8',
-                             'XXXXX567X',
-                             'XXXX4XX78',
-                             'XXXX4X6X8',
-                             'XXXX45X7X',
-                             'XXXX456XX',
-                             'XXX3X5XX8',
-                             'XXX3X5X7X',
-                             'XXX345XXX',
-                             'XX2XXX6X8',
-                             'XX2XXX67X',
-                             'XX23XXXX8',
-                             'XX23XXX7X',
-                             'XXXXXXX78',
-                             'XXXXXX6X8',
-                             'XXXXX5X7X',
-                             'XXXXX56XX',
-                             'XXXX4XXX8',
-                             'XXXX4XX7X',
-                             'XXX3X5XXX',
-                             'XX2XXX6XX',
-                             'XXXXXXXX8',
-                             'XXXXXXX7X',
-                             'XXXX4XXXX'],
-                       'a': ['X1234567X',
-                             '0X2X45678',
-                             '0X23456X8',
-                             'XX2345X78',
-                             'X1X3X5678',
-                             'X1X3456X8',
-                             'X123XX678',
-                             'XX2XX5678',
-                             'XX2X4X678',
-                             'XX2X4567X',
-                             'XX23456XX',
-                             'X1X345X7X',
-                             '0X2X4X6X8',
-                             'XX23XXX78',
-                             'XX234XXX8',
-                             'XX234XX7X',
-                             'XX2X4X6XX'],
-                       'ab': ['XX23X5678', 'X1X345X78', '0X2XX5678', 'XX234X6X8', 'XX234X67X'],
-                       'ad': ['XX2345678'],
-                       'b': ['X1X345678',
-                             'X123X5678',
-                             'X1234X678',
-                             '0X23X5678',
-                             'XX2X45678',
-                             '0X2X4X678',
-                             'XX23XX678',
-                             'XX23X5X78',
-                             'XX234XX78',
-                             'XX2345XX8',
-                             'XX2345X7X',
-                             'X1X3X56X8',
-                             'X123XX6X8',
-                             'XX2X4X6X8',
-                             'XX2X4X67X'],
-                       'c': ['012345678'],
-                       'cc': [],
-                       'd': ['XX234X678', 'XX23456X8', 'XX234567X']}
+EVALUATE_BOARD_DICT = {
+    'a': ['X1234567X', '0X2X45678', '0X23456X8', 'XX2345X78', 'X1X3X5678', 'X1X3456X8', 'X123XX678', 'XX2XX5678',
+          'XX2X4X678', 'XX2X4567X', 'XX23456XX', 'X1X345X7X', '0X2X4X6X8', 'XX23XXX78', 'XX234XXX8', 'XX234XX7X',
+          'XX2X4X6XX'],
+    'ab': ['XX23X5678', 'X1X345X78', '0X2XX5678', 'XX234X6X8', 'XX234X67X'],
+    'ad': ['XX2345678'],
+    'b': ['X1X345678', 'X123X5678', 'X1234X678', '0X23X5678', 'XX2X45678', '0X2X4X678', 'XX23XX678', 'XX23X5X78',
+          'XX234XX78', 'XX2345XX8', 'XX2345X7X', 'X1X3X56X8', 'X123XX6X8', 'XX2X4X6X8', 'XX2X4X67X'],
+    'c': ['012345678'],
+    'cc': ['0123X5678'],
+    'd': ['XX234X678', 'XX23456X8', 'XX234567X']
+}
 
 
 class GameBoard(object):
@@ -112,6 +28,7 @@ class GameBoard(object):
     def __init__(self, board=None):
         if board is None:
             self.__board = [str(i) for i in range(9)]
+
         else:
             self.__board = board
 
@@ -177,27 +94,35 @@ class GameBoard(object):
 
     def evaluate_board(self):
         if self.is_dead():
-            return 1
+            return '1'
 
-        new_board = self.__board[:]
-        while 'X' in new_board:
-            new_board.remove('X')
+        for key in EVALUATE_BOARD_DICT:
+            if self in EVALUATE_BOARD_DICT[key]:
+                return key
+        return '1'
 
-        number_sum = sum([int(i) for i in new_board])
-        if len(new_board) == 9:
-            return 'c'
+    def get_valid_action(self):
+        ''' Return the valid ceil that we can put chess on '''
+        if self.is_dead():
+            return []
 
-        elif len(new_board) == 8:
-            if '4' in new_board:
-                return 1
+        action = self.__board[:]
+        while 'X' in action:
+            action.remove('X')
+
+        return action
+
+    def get_empty_line_num(self):
+        ''' Get how many possible line number left '''
+        all_line = ['012', '345', '789', '036', '147', '258', '048', '246']
+        possible_line = []
+        for i in all_line:
+            for j in i:
+                if self.__board[int(j)] == 'X':
+                    break
             else:
-                return 'cc'
-
-        elif len(new_board) == 7:
-            if '4' in new_board:
-                pass
-            else:
-                return 'b'
+                possible_line.append(i)
+        return len(all_line)
 
     def rotate_board(self):
         ''' In order to evaluate the board type, we need to get the reversed board type '''
@@ -223,6 +148,13 @@ class GameBoard(object):
 
         return (board_90, board_180, board_270, get_symmetry(board), get_symmetry(board_90), get_symmetry(board_180),
                 get_symmetry(board_270))
+
+    def try_action(self, pos):
+        if isinstance(pos, str):
+            pos = int(pos)
+        new_board = self.copy()
+        new_board[pos] = 'X'
+        return new_board
 
 
 class TicTacToeGame(object):
@@ -288,20 +220,27 @@ class TicTacToeGame(object):
                 return False
         return True
 
-    def play(self, ai_num=0):
+    def play(self, ai_player1=False, ai_player2=False):
         '''
         Play tic tac toe game
-        :param ai_num: the number of AI players, if this number greater than 2, regard as 2
+        :param ai_player1: the number of AI players, if this number greater than 2, regard as 2
         '''
-        if ai_num > 2:
-            ai_num = 2
+        if ai_player1 and ai_player2:
+            players = [AIPlayer('AI1'), AIPlayer('AI2')]
+        elif ai_player2:
+            players = ['Your', AIPlayer('AI')]
+        elif ai_player1:
+            players = [AIPlayer('AI'), 'Your']
+        else:
+            players = ['Player1', 'Player2']
 
-        self.player_name = PLAYERS[ai_num]
         while not self.is_finish():
-            player_name = self.player_name[int(self.player_index)]
-            print '{}:'.format(self.player_name[int(self.player_index)]),
-            if 'AI' in player_name:
-                pass
+            player_index = int(self.player_index)
+            player = players[player_index]
+            print '{} move:'.format(player),
+            if isinstance(player, AIPlayer):
+                action = player.get_next_action(self.board)
+                print action.upper()
             else:
                 action = raw_input()
                 while not self.is_valid_action(action):
@@ -311,17 +250,97 @@ class TicTacToeGame(object):
 
             self.player_index = not self.player_index
 
-        player_name = self.player_name[int(self.player_index)]
-        print "{} wins".format(player_name.split(' ')[0])
+        player = players[int(self.player_index)]
+        print "{} wins".format(player)
 
 
 class AIPlayer(object):
-    def __init__(self):
-        pass
+    def __init__(self, name):
+        self.__name = name
 
+    def __str__(self):
+        return self.__name
+
+    def get_next_action(self, board):
+        board_num = len(board)
+        valid_action_list = [i.get_valid_action() for i in board]
+        state_list = [i.evaluate_board() for i in board]
+        for i in range(board_num):
+            board_index = chr(ord('a') + i)
+            for action in valid_action_list[i]:
+                new_board = board[i].try_action(action)
+                new_state_list = state_list[:]
+                new_state_list[i] = new_board.evaluate_board()
+                current = analysis_state(new_state_list)
+                if current in P_POSITION:
+                    return '{}{}'.format(board_index, action)
+
+        for i in range(board_num):
+            board_index = chr(ord('a') + i)
+            for action in valid_action_list[i]:
+                return '{}{}'.format(board_index, action)
+
+
+def analysis_state(state):
+    ''' Apply Q = < a, b, c, d | aa = 1, bbb = b, bbc = c, ccc = acc, bbd = d, cd = ad, dd = cc> to get current game
+    state '''
+    if isinstance(state, str):
+        pass
+    elif isinstance(state, list):
+        state = ''.join(state)
+    else:
+        raise ValueError("Invalid state: {}".format(state))
+
+    def remove_unused(temp):
+
+        # index 0 is count a, 1 is count b, 2 is count c, 3 is count d
+        num_index = {'a': 0, 'b': 0, 'c': 0, 'd': 0, '1': 0}
+        for i in temp:
+            num_index[i] += 1
+
+        # Apply bbd = d, bbc = c, bbb = b
+        while num_index['b'] > 1:
+            if num_index['b'] > 2 or num_index['c'] > 0 or num_index['d'] > 0:
+                num_index['b'] -= 2
+            else:
+                break
+
+        # Apply dd = cc
+        while num_index['d'] > 1:
+            num_index['c'] += 2
+            num_index['d'] -= 2
+
+        # Apply ccc = acc
+        while num_index['c'] > 2:
+            num_index['c'] -= 1
+            num_index['a'] += 1
+
+        # Apply cd = ad
+        while num_index['d'] > 0 and num_index['c'] > 0:
+            num_index['c'] -= 1
+            num_index['a'] += 1
+
+        # Apply aa = 1
+        while num_index['a'] > 1:
+            num_index['a'] -= 2
+
+        temp = 'a' * num_index['a'] + 'b' * num_index['b'] + 'c' * num_index['c'] + 'd' * num_index['d']
+        return temp
+
+    def is_final_state():
+        return len(state) == 0 or ''.join(state) in Q
+
+    while not is_final_state():
+        former_state = state[:]
+        state = remove_unused(state)
+        if former_state == state:
+            break
+
+    if len(state) == 0:
+        return '1'
+    else:
+        return ''.join(state)
 
 if __name__ == "__main__":
-    test = TicTacToeGame(1)
-    test.play()
-    # test_game_board()
-    # get_all_board()
+    test = TicTacToeGame(6)
+    test.play(False, True)
