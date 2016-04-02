@@ -8,4 +8,15 @@
 \geometry{left=2cm, right=2cm, top=2cm, bottom=2cm}
 \begin{document}
 	\maketitle
+	\section{Reflex Agent}
+	\label{sec:Q1}
+	The evaluation function I implemented is mainly based on two factors,
+	\begin{enumerate}
+		\item \textbf{The distance between ghosts and Pacman}. The evaluation function give higher score, while Pacman is further away from ghosts. The Manhattan Distance between ghost and Pacman is greater than 5 is regarded as a safe distance, and returns 5 point bonus each ghost. while less than 2 is a dangerous, immediately return minimum score. When ghost is eatable, this value will times -1. 
+		\item \textbf{The distance between Pacman and food}. If next position contains a food, add 10 points, otherwise, minus the distance between Pacman and its nearest food 
+	\end{enumerate}
+	Also this function will give one bonus if the action is not STOP.\\
+	Normally, this evaluation function acts very good in "testClassic". But as I don't take wall into consideration, this function does not act so well in "mediumClassic"
+	\section{Minimax Agent}
+	\label{sec:Q2}
 \end{document}
