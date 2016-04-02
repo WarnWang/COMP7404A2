@@ -70,12 +70,13 @@ class GameBoard(object):
         return board
 
     def __eq__(self, other):
+        ''' Check whether two board are equal '''
         str1 = {''.join(self)}
         if isinstance(other, str):
             str2 = other
         else:
             str2 = ''.join(other)
-        str_list = self.rotate_board()
+        str_list = self.__rotate_board()
         for board in str_list:
             str1.add(''.join(board))
         return str2 in str1
@@ -136,7 +137,7 @@ class GameBoard(object):
                 possible_line.append(i)
         return len(all_line)
 
-    def rotate_board(self):
+    def __rotate_board(self):
         ''' In order to evaluate the board type, we need to get the reversed board type '''
         board = self.__board
         board_180 = list(reversed(self.__board))
@@ -150,6 +151,7 @@ class GameBoard(object):
             if board_270[i] != 'X':
                 board_270[i] = str(i)
 
+        # As symmetry board can also be regarded as same board
         def get_symmetry(temp):
             new_board = [temp[2], temp[1], temp[0], temp[5], temp[4], temp[3], temp[8], temp[7], temp[6]]
             for i in range(9):
@@ -222,13 +224,18 @@ class TicTacToeGame(object):
             return False
         return self.board[board_index].is_valid_move(int(piece_index))
 
-    def take_action(self, position):
-        position = position.lower()
-        if not self.is_valid_action(position):
-            raise ValueError('Invalid action {}'.format(position))
+    def take_action(self, action):
+        '''
+        Change board value based on the action input
+        :param action: action pos
+        :return: None
+        '''
+        action = action.lower()
+        if not self.is_valid_action(action):
+            raise ValueError('Invalid action {}'.format(action))
 
-        board_index = ord(position[0]) - ord('a')
-        self.board[board_index][int(position[1])] = 'X'
+        board_index = ord(action[0]) - ord('a')
+        self.board[board_index][int(action[1])] = 'X'
 
     def is_finish(self):
         ''' Check whether game is finished or not '''
@@ -246,16 +253,19 @@ class TicTacToeGame(object):
         if player1_is_ai and player2_is_ai:
             players = [AIPlayer('AI1'), AIPlayer('AI2')]
         elif player2_is_ai:
-            players = ['Your', AIPlayer('AI')]
+            players = ['Your', AIPlayer()]
         elif player1_is_ai:
-            players = [AIPlayer('AI'), 'Your']
+            players = [AIPlayer(), 'Your']
         else:
             players = ['Player1', 'Player2']
 
+        # Main game code
         while not self.is_finish():
             player_index = int(self.player_index)
             player = players[player_index]
             print '{} move:'.format(player),
+
+            # get player type
             if isinstance(player, AIPlayer):
                 action = player.get_next_action(self.board)
                 print action.upper()
@@ -273,17 +283,36 @@ class TicTacToeGame(object):
 
 
 class AIPlayer(object):
-    def __init__(self, name):
+    '''
+    AI Class, used to generate next action based on boards
+    '''
+
+    def __init__(self, name='AI', depth=1):
         self.__name = name
+        self.__depth = depth
 
     def __str__(self):
         return self.__name
 
-    def get_next_action(self, board):
-        ''' Use one step BFS solution to find the best action '''
+    def get_next_action(self, board, current_player=True, depth=0):
+        '''
+        Use depth limit search to find the best action
+
+        @:param board: current board state
+        @:param current_player: whether AI is current player
+        @:param depth: current searching depth, default is 0
+        @:return: if AI is current player, return AI action else return the number of positive position that next
+        player has
+        '''
+
         board_num = len(board)
         valid_action_list = [i.get_valid_action() for i in board]
         state_list = [i.evaluate_board() for i in board]
+        win_action = []
+        min_win = None
+        next_action = None
+
+        # travel all possible actions to find the best option
         for i in range(board_num):
             board_index = chr(ord('a') + i)
             for action in valid_action_list[i]:
@@ -291,13 +320,24 @@ class AIPlayer(object):
                 new_state_list = state_list[:]
                 new_state_list[i] = new_board.evaluate_board()
                 current = analysis_state(new_state_list)
-                if current in P_POSITION:
-                    return '{}{}'.format(board_index, action)
 
-        for i in range(board_num):
-            board_index = chr(ord('a') + i)
-            for action in valid_action_list[i]:
-                return '{}{}'.format(board_index, action)
+                # if current action is in P_POSITION, which means current player must win
+                if current in P_POSITION:
+                    if current_player:
+                        return '{}{}'.format(board_index, action)
+                    else:
+                        win_action.append('{}{}'.format(board_index, action))
+
+                # else if find the action with the minimum actions number
+                elif depth < self.__depth:
+                    new_board_list = board[:]
+                    new_state_list[i] = new_board
+                    n_of_win_action = self.get_next_action(new_board_list, not current_player, depth + 1)
+                    if min_win is None or n_of_win_action < min_win:
+                        min_win = n_of_win_action
+                        next_action = '{}{}'.format(board_index, action)
+
+        return next_action if current_player else len(win_action)
 
 
 def analysis_state(state):
@@ -310,11 +350,13 @@ def analysis_state(state):
     else:
         raise ValueError("Invalid state: {}".format(state))
 
-    def remove_unused(temp):
+    # When state still has value and current state is not a goal state
+    while len(state) != 0 and ''.join(state) not in Q:
+        former_state = state
 
         # index 0 is count a, 1 is count b, 2 is count c, 3 is count d
         num_index = {'a': 0, 'b': 0, 'c': 0, 'd': 0, '1': 0}
-        for i in temp:
+        for i in state:
             num_index[i] += 1
 
         # Apply bbd = d, bbc = c, bbb = b
@@ -343,15 +385,7 @@ def analysis_state(state):
         while num_index['a'] > 1:
             num_index['a'] -= 2
 
-        temp = 'a' * num_index['a'] + 'b' * num_index['b'] + 'c' * num_index['c'] + 'd' * num_index['d']
-        return temp
-
-    def is_final_state():
-        return len(state) == 0 or ''.join(state) in Q
-
-    while not is_final_state():
-        former_state = state[:]
-        state = remove_unused(state)
+        state = 'a' * num_index['a'] + 'b' * num_index['b'] + 'c' * num_index['c'] + 'd' * num_index['d']
         if former_state == state:
             break
 
@@ -361,5 +395,5 @@ def analysis_state(state):
         return ''.join(state)
 
 if __name__ == "__main__":
-    test = TicTacToeGame(1)
-    test.play(player1_is_ai=False, player2_is_ai=True)
+    test = TicTacToeGame(3)
+    test.play(player1_is_ai=True, player2_is_ai=False)
