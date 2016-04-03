@@ -39,6 +39,22 @@
 	\label{sec:Q5}
 	I use similar method as in section~\ref{sec:Q1}, based on the distance of Pacman to ghosts and Pacman to the nearest food.\\
 	On my computer, in Question5, average score is 1219.9, win rate is 100\% and running time is about 9s, which I think is a considerable good performance.
+	\section{Tic Tac Toe Game}
+	\label{sec:Q6}
+	This game is a little different from the traditional Tic-Tac-Toe game, as player only can cross X.\\
+	I defined 3 classes to implement this game,
+	\begin{itemize}
+		\item \textbf{GameBoard class} Use to represent one board. Main method includes, 
+		\begin{itemize}
+			\item \textit{\_\_eq\_\_()} check whether two boards are equal. The difficulties in this function is that board with different order may be the same board (e.g. X123X5678 and 01X3X5678 actually are same board), so we need to rotate the board, and compare whether one board is equal to another, its rotated and symmetric boards.
+			\item \textit{get\_valid\_actions()} returns valid actions of current board (if no such action, return an empty list).
+			\item \textit{evaluate\_board()}. Evaluate current game board and give a score, based on \cite{winning_strategy}. Use a function to generate all the board shape as a lookup table, and will return of value in that table.
+		\end{itemize}
+		\item \textbf{TicTacToeGame class} main game class, store all the boards, players information, judge whether current player's action is a valid move, and check whether game is over.
+		\item \textbf{AIPlayer class} 
+	\end{itemize}
+	Besides, I implement \textit{merge\_state()} to merge the states of all board together. As for multiple board, just simply add all the board score together may not get the final score. This function also bases on \cite{winning_strategy}.\\ 
+	I did a little more than required. In my game, you can play in any number of boards and choose to be first hand or second hand. Also, you can also watch two AI players play against each other.
 	\begin{thebibliography}{1}
 		\bibitem{winning_strategy} 
 		Plambeck, Thane E., and Greg Whitehead. 

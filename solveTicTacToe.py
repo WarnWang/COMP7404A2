@@ -35,7 +35,7 @@ EVALUATE_BOARD_DICT = {
 
 
 class GameBoard(object):
-    ''' Use to store the date of current game board '''
+    """ Use to store the date of current game board """
 
     def __init__(self, board=None):
         if board is None:
@@ -72,7 +72,7 @@ class GameBoard(object):
         return board
 
     def __eq__(self, other):
-        ''' Check whether two board are equal '''
+        """ Check whether two board are equal """
         str1 = {''.join(self)}
         if isinstance(other, str):
             str2 = other
@@ -87,12 +87,12 @@ class GameBoard(object):
         return tuple(self.__board).__hash__()
 
     def copy(self):
-        ''' Get a copy of current board '''
+        """ Get a copy of current board """
         new_board = self.__board[:]
         return GameBoard(new_board)
 
     def is_dead(self):
-        ''' Check whether current board can be played any more '''
+        """ Check whether current board can be played any more """
         possible_lines = ['012', '345', '678', '036', '147', '258', '048', '246']
         for i in possible_lines:
             for j in i:
@@ -103,11 +103,11 @@ class GameBoard(object):
         return False
 
     def is_valid_move(self, pos):
-        ''' Check whether current position can be set to X '''
+        """ Check whether current position can be set to X """
         return not self.is_dead() and pos in range(9) and self.__board[pos] != 'X'
 
     def evaluate_board(self):
-        ''' Get the evaluation of current board '''
+        """ Get the evaluation of current board """
         if self.is_dead():
             return '1'
 
@@ -116,8 +116,8 @@ class GameBoard(object):
                 return key
         return '1'
 
-    def get_valid_action(self):
-        ''' Return the valid ceil that we can put chess on '''
+    def get_valid_actions(self):
+        """ Return the valid ceil that we can put chess on """
         if self.is_dead():
             return []
 
@@ -127,20 +127,8 @@ class GameBoard(object):
 
         return action
 
-    def get_empty_line_num(self):
-        ''' Get how many possible line number left '''
-        all_line = ['012', '345', '789', '036', '147', '258', '048', '246']
-        possible_line = []
-        for i in all_line:
-            for j in i:
-                if self.__board[int(j)] == 'X':
-                    break
-            else:
-                possible_line.append(i)
-        return len(all_line)
-
     def __rotate_board(self):
-        ''' In order to evaluate the board type, we need to get the reversed board type '''
+        """ In order to evaluate the board type, we need to get the reversed board type """
         board = self.__board
         board_180 = list(reversed(self.__board))
         board_90 = [board[6], board[3], board[0], board[7], board[4], board[1], board[8], board[5], board[2]]
@@ -166,11 +154,11 @@ class GameBoard(object):
                 get_symmetry(board_270))
 
     def try_action(self, pos):
-        '''
+        """
         Try to change pos to 'X' and return a new board
         :param pos: pos index, must be in [0, 8]
         :return: a new board with pos set to 'X'
-        '''
+        """
         if isinstance(pos, str):
             pos = int(pos)
         new_board = self.copy()
@@ -180,9 +168,9 @@ class GameBoard(object):
 
 class TicTacToeGame(object):
     def __init__(self, board_num=3):
-        '''
+        """
         init game only support 3 boards currently
-        '''
+        """
         self.board = []
         self.board_num = board_num
         for i in range(board_num):
@@ -191,10 +179,10 @@ class TicTacToeGame(object):
         self.player_name = None
 
     def __str__(self):
-        '''
+        """
         Use a string to represent current board
         :return: the board string
-        '''
+        """
         string_info = []
         for i in range(self.board_num):
             character = chr(ord('A') + i)
@@ -212,11 +200,11 @@ class TicTacToeGame(object):
         return "{}\n{}\n{}\n{}".format(string_info, row1, row2, row3)
 
     def is_valid_action(self, action_pos):
-        '''
+        """
         Check whether current move is valid move
         :param action_pos: the position that need to change to X
         :return: whether this action is valid or not
-        '''
+        """
         action_pos = action_pos.lower()
         if len(action_pos) != 2:
             return False
@@ -227,11 +215,11 @@ class TicTacToeGame(object):
         return self.board[board_index].is_valid_move(int(piece_index))
 
     def take_action(self, action):
-        '''
+        """
         Change board value based on the action input
         :param action: action pos
         :return: None
-        '''
+        """
         action = action.lower()
         if not self.is_valid_action(action):
             raise ValueError('Invalid action {}'.format(action))
@@ -240,18 +228,18 @@ class TicTacToeGame(object):
         self.board[board_index][int(action[1])] = 'X'
 
     def is_finish(self):
-        ''' Check whether game is finished or not '''
+        """ Check whether game is finished or not """
         for board in self.board:
             if not board.is_dead():
                 return False
         return True
 
     def play(self, player1_is_ai=True, player2_is_ai=False):
-        '''
+        """
         Play tic tac toe game
         :param player1_is_ai: Whether player1 is AI or not
         :param player2_is_ai: Whether player2 is AI or not
-        '''
+        """
         if player1_is_ai and player2_is_ai:
             players = [AIPlayer('AI1'), AIPlayer('AI2')]
         elif player2_is_ai:
@@ -285,9 +273,9 @@ class TicTacToeGame(object):
 
 
 class AIPlayer(object):
-    '''
+    """
     AI Class, used to generate next action based on boards
-    '''
+    """
 
     def __init__(self, name='AI', depth=1):
         self.__name = name
@@ -297,7 +285,7 @@ class AIPlayer(object):
         return self.__name
 
     def get_next_action(self, board, current_player=True, depth=0):
-        '''
+        """
         Use depth limit search to find the best action
 
         @:param board: current board state
@@ -305,10 +293,10 @@ class AIPlayer(object):
         @:param depth: current searching depth, default is 0
         @:return: if AI is current player, return AI action else return the number of positive position that next
         player has
-        '''
+        """
 
         board_num = len(board)
-        valid_action_list = [i.get_valid_action() for i in board]
+        valid_action_list = [i.get_valid_actions() for i in board]
         state_list = [i.evaluate_board() for i in board]
         win_action = []
         min_win = None
@@ -321,7 +309,7 @@ class AIPlayer(object):
                 new_board = board[i].try_action(action)
                 new_state_list = state_list[:]
                 new_state_list[i] = new_board.evaluate_board()
-                current = analysis_state(new_state_list)
+                current = merge_state(new_state_list)
 
                 # if current action is in P_POSITION, which means current player must win
                 if current in P_POSITION:
@@ -342,9 +330,9 @@ class AIPlayer(object):
         return next_action if current_player else len(win_action)
 
 
-def analysis_state(state):
-    ''' Apply Q = < a, b, c, d | aa = 1, bbb = b, bbc = c, ccc = acc, bbd = d, cd = ad, dd = cc> to get current game
-    state '''
+def merge_state(state):
+    """ Apply Q = < a, b, c, d | aa = 1, bbb = b, bbc = c, ccc = acc, bbd = d, cd = ad, dd = cc> to get current game
+    state """
     if isinstance(state, str):
         pass
     elif isinstance(state, list):

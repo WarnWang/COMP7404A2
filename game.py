@@ -136,7 +136,7 @@ class AgentState(object):
             return "Ghost: " + str(self.configuration)
 
     def __eq__(self, other):
-        if other == None:
+        if other is None:
             return False
         return self.configuration == other.configuration and self.scaredTimer == other.scaredTimer
 
@@ -151,7 +151,8 @@ class AgentState(object):
         return state
 
     def getPosition(self):
-        if self.configuration == None: return None
+        if self.configuration is None:
+            return None
         return self.configuration.getPosition()
 
     def getDirection(self):
