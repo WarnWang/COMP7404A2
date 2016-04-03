@@ -16,6 +16,7 @@ from game import Agent, Directions
 MAX_VALUE = 2 ** 16 - 1
 MIN_VALUE = 1 - 2 ** 16
 
+
 class ReflexAgent(Agent):
     """
       A reflex agent chooses an action at each choice point by examining
@@ -67,6 +68,7 @@ class ReflexAgent(Agent):
         new_pos = successor_game_state.getPacmanPosition()
         new_food = successor_game_state.getFood()
         new_ghost = successor_game_state.getGhostStates()
+        walls = successor_game_state.getWalls()
         ghost_pos = successor_game_state.getGhostPositions()
 
         "*** YOUR CODE HERE ***"
@@ -99,23 +101,32 @@ class ReflexAgent(Agent):
                 else:
                     next_score += distance
 
-        # Calculate the food impact
-        food_list = new_food.asList()
-        next_pos = new_pos
-
         # If new position has a food, add 10 score
         if currentGameState.getFood()[new_pos[0]][new_pos[1]]:
             next_score += 10
 
-        # Else find the nearest food position
-        elif food_list:
-            length = util.manhattanDistance(food_list[0], next_pos)
-            for i in food_list:
-                new_length = util.manhattanDistance(i, next_pos)
-                if new_length < length:
-                    length = new_length
-            next_score -= length
+        # Else use bfs to find the nearest food position
+        else:
+            pos_to_explore = []
+            explored_pos = set()
+            pos_to_explore.append((new_pos, 0))
+            distance = 0
+            while pos_to_explore:
+                frontier = pos_to_explore.pop(0)
+                explored_pos.add(frontier[0])
+                if new_food[frontier[0][0]][frontier[0][1]]:
+                    distance = frontier[1]
+                    break
+                else:
+                    successor_pos = [(frontier[0][0] + 1, frontier[0][1]), (frontier[0][0] - 1, frontier[0][1]),
+                                     (frontier[0][0], frontier[0][1] + 1), (frontier[0][0], frontier[0][1] - 1)]
+                    for pos in successor_pos:
+                        if pos[0] < 0 or pos[0] >= new_food.width or pos[1] < 0 or pos[1] >= new_food.height:
+                            continue
+                        if not walls[pos[0]][pos[1]] and pos not in explored_pos:
+                            pos_to_explore.append((pos, frontier[1] + 1))
 
+            next_score -= distance
         return next_score
 
 
@@ -520,6 +531,8 @@ def betterEvaluationFunction(currentGameState):
     ghost_pos = currentGameState.getGhostPositions()
     ghost_state = currentGameState.getGhostStates()
     current_value = currentGameState.getScore()
+    food_pos = currentGameState.getFood()
+    wall_pos = currentGameState.getWalls()
 
     # Calculate the ghost related score
     for i in range(len(ghost_pos)):
@@ -540,19 +553,27 @@ def betterEvaluationFunction(currentGameState):
             else:
                 current_value += distance
 
-    # Calculate the food impact
-    food_list = currentGameState.getFood().asList()
+    # Use BFS to find the nearest food position
+    pos_to_explore = []
+    explored_pos = set()
+    pos_to_explore.append((pacman_pos, 0))
+    distance = 0
+    while pos_to_explore:
+        frontier = pos_to_explore.pop(0)
+        explored_pos.add(frontier[0])
+        if food_pos[frontier[0][0]][frontier[0][1]]:
+            distance = frontier[1]
+            break
+        else:
+            successor_pos = [(frontier[0][0] + 1, frontier[0][1]), (frontier[0][0] - 1, frontier[0][1]),
+                             (frontier[0][0], frontier[0][1] + 1), (frontier[0][0], frontier[0][1] - 1)]
+            for pos in successor_pos:
+                if pos[0] < 0 or pos[0] >= food_pos.width or pos[1] < 0 or pos[1] >= food_pos.height:
+                    continue
+                if not wall_pos[pos[0]][pos[1]] and pos not in explored_pos:
+                    pos_to_explore.append((pos, frontier[1] + 1))
 
-    # Else find the nearest food position
-    if food_list:
-        length = util.manhattanDistance(food_list[0], pacman_pos)
-        for i in range(len(food_list)):
-            new_length = util.manhattanDistance(food_list[i], pacman_pos)
-            if new_length <= length:
-                length = new_length
-
-        current_value -= length
-        current_value -= len(food_list) * 8
+    current_value -= distance
 
     return current_value
 

@@ -220,11 +220,12 @@ class Grid(object):
         return sum([x.count(item) for x in self.data])
 
     def asList(self, key=True):
-        list = []
+        result_list = []
         for x in range(self.width):
             for y in range(self.height):
-                if self[x][y] == key: list.append((x, y))
-        return list
+                if self[x][y] == key:
+                    result_list.append((x, y))
+        return result_list
 
     def packBits(self):
         """
