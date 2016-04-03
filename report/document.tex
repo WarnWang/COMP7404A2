@@ -1,6 +1,11 @@
 \documentclass{article}
 \usepackage{geometry}
 \usepackage{wrapfig}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.5em}
 
 \title{Assignment2}
 \author{Wang Youan (3035237236)}
@@ -15,12 +20,12 @@
 		\item \textbf{The distance between ghosts and Pacman}. The evaluation function give higher score, while Pacman is further away from ghosts. The Manhattan Distance between ghost and Pacman is greater than 5 is regarded as a safe distance, and returns 5 point bonus each ghost. while less than 2 is a dangerous, immediately return minimum score. When ghost is eatable, this value will times -1. 
 		\item \textbf{The distance between Pacman and food}. Use Breadth first search (GSA) to find the nearest food. As the path cost is always one, BFS acts just the same as UCS, and can find the optimal solution. Besides, the process of generating points will produce many duplicate position which have been visited before, so I choose GSA to improve the speed. 
 	\end{enumerate}
-	Also this function will give one bonus if the action is not STOP.\\
+	Also this function will give one bonus if the action is not STOP.\par
 	Normally, this evaluation function acts very good in both "testClassic" (average score is 561, and winning rate is 100\%) and "mediumClassic" (average score is 1503.171, 1584,winning rate is 99.8\%, 93.5\% for one ghost and two ghosts respectively).
 	\section{Minimax Agent}
 	\label{sec:Q2}
-	I first generate all the possible next actions that the agent can do, then use "evaluate\_function" to get the score of current action, then find the highest score, and return the action related to that score\\
-	I use recurse to achieve the evaluate\_actions, which needs 3 inputs, agent\_index, depth, game\_state. This single method can act as both min-value and max-value based on current agent index.\\
+	I first generate all the possible next actions that the agent can do, then use "evaluate\_function" to get the score of current action, then find the highest score, and return the action related to that score\par
+	I use recurse to achieve the evaluate\_actions, which needs 3 inputs, agent\_index, depth, game\_state. This single method can act as both min-value and max-value based on current agent index.\par
 	The problem of such agent is the speed of get action. In my Mac, for a "smallClassic" layout, when depth is set to 4, it usually takes about 3 seconds to do one action. Besides, as the evaluation function is not so good, often, Pacman will remains stay if both ghosts and food are a little far away from it.
 	\section{Alpha-Beta Prune Agent}
 	\label{sec:Q3}
@@ -32,29 +37,29 @@
 	This agent acts faster than Minimax Agent. If usually takes about 1.5 seconds to determine the action. However, in the same cases of that to Minimax Agent, this also choose to stay.
 	\section{Expectimax Agent}
 	\label{sec:Q4}
-	It is true that usually ghost just random walks, not an adversary who makes optimal decisions and sometimes Minimax agent choose wrong action. That's why we need Expectimax Agent, which will calculate the possibility of every enemy's action and choose the action with highest expect score.\\
-	The code of this agent looks much similar of that in section~\ref{sec:Q2}, the only difference is that instead of return min-value, it will return the average value of all actions.\\
+	It is true that usually ghost just random walks, not an adversary who makes optimal decisions and sometimes Minimax agent choose wrong action. That's why we need Expectimax Agent, which will calculate the possibility of every enemy's action and choose the action with highest expect score.\par
+	The code of this agent looks much similar of that in section~\ref{sec:Q2}, the only difference is that instead of return min-value, it will return the average value of all actions.\par
 	This gives "trappedClassic" about 49.2\% winning rate (compares to 0\% of Minimax Agent)
 	\section{Better Evaluation Function}
 	\label{sec:Q5}
-	I use similar method as in section~\ref{sec:Q1}, based on the distance of Pacman to ghosts and Pacman to the nearest food.\\
+	I use similar method as in section~\ref{sec:Q1}, based on the distance of Pacman to ghosts and Pacman to the nearest food.\par
 	On my computer, in Question5, average score is 1219.9, win rate is 100\% and running time is about 9s, which I think is a considerable good performance.
 	\section{Tic Tac Toe Game}
 	\label{sec:Q6}
-	This game is a little different from the traditional Tic-Tac-Toe game, as player only can cross X.\\
+	This game is a little different from the traditional Tic-Tac-Toe game, as player only can cross X.\par
 	I defined 3 classes to implement this game,
 	\begin{itemize}
-		\item \textbf{GameBoard class} Use to represent one board. Main method includes, 
+		\item \textbf{GameBoard} Use to represent one board. Main method includes, 
 		\begin{itemize}
-			\item \textit{\_\_eq\_\_()} check whether two boards are equal. The difficulties in this function is that board with different order may be the same board (e.g. X123X5678 and 01X3X5678 actually are same board), so we need to rotate the board, and compare whether one board is equal to another, its rotated and symmetric boards.
+			\item \textit{\_\_eq\_\_()} check whether two boards are equal. The difficulties in this function is that board with different order may be the same board (e.g. \textit{X123X5678} and \textit{01X3X5678} actually are same board), so we need to rotate the board, and compare whether one board is equal to another, its rotated and symmetric boards.
 			\item \textit{get\_valid\_actions()} returns valid actions of current board (if no such action, return an empty list).
 			\item \textit{evaluate\_board()}. Evaluate current game board and give a score, based on \cite{winning_strategy}. Use a function to generate all the board shape as a lookup table, and will return of value in that table.
 		\end{itemize}
-		\item \textbf{TicTacToeGame class} main game class, store all the boards, players information, judge whether current player's action is a valid move, and check whether game is over.
-		\item \textbf{AIPlayer class} 
+		\item \textbf{TicTacToeGame} main game class, store all the boards, players information, judge whether current player's action is a valid move, and check whether game is over.
+		\item \textbf{AIPlayer} mainly used to get action based on current board status. As can be found in \cite{winning_strategy}, if current player want to win, he must ensure that after his move, the position of all boards must in $ {a,b^2,bc,c^2} $. Otherwise, his adversary will have the chance of win. For odd numbers of board, the player go first win, but even just the opposite. So, under the assignment's rule (3 boards, AI go first), there must exit such move that AI must win. So just one step BFS search is enough to find right action.
 	\end{itemize}
-	Besides, I implement \textit{merge\_state()} to merge the states of all board together. As for multiple board, just simply add all the board score together may not get the final score. This function also bases on \cite{winning_strategy}.\\ 
-	I did a little more than required. In my game, you can play in any number of boards and choose to be first hand or second hand. Also, you can also watch two AI players play against each other.
+	Besides, I implement \textit{merge\_state()} to merge the states of all board together. As for multiple board, just simply add all the board score together may not get the final score. This function also bases on \cite{winning_strategy}.\par 
+	I did a little more than required. In my game, you can play in any number of boards and choose to be first hand or second hand. Also, you can also watch two AI players play against each other. The difficult lies in optimal move not always exists in some cases. (e.g two boards, the first player has no optimal solution). So I just simply choose an action with least optimal solution number, and wish next player can't find the best choice.
 	\begin{thebibliography}{1}
 		\bibitem{winning_strategy} 
 		Plambeck, Thane E., and Greg Whitehead. 
