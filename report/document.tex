@@ -13,10 +13,10 @@
 	The evaluation function I implemented is mainly based on two factors,
 	\begin{enumerate}
 		\item \textbf{The distance between ghosts and Pacman}. The evaluation function give higher score, while Pacman is further away from ghosts. The Manhattan Distance between ghost and Pacman is greater than 5 is regarded as a safe distance, and returns 5 point bonus each ghost. while less than 2 is a dangerous, immediately return minimum score. When ghost is eatable, this value will times -1. 
-		\item \textbf{The distance between Pacman and food}. If next position contains a food, add 10 points, otherwise, minus the distance between Pacman and its nearest food 
+		\item \textbf{The distance between Pacman and food}. Use Breadth first search (GSA) to find the nearest food. As the path cost is always one, BFS acts just the same as UCS, and can find the optimal solution. Besides, the process of generating points will produce many duplicate position which have been visited before, so I choose GSA to improve the speed. 
 	\end{enumerate}
 	Also this function will give one bonus if the action is not STOP.\\
-	Normally, this evaluation function acts very good in "testClassic". But as I don't take wall into consideration, this function does not act so well in "mediumClassic"
+	Normally, this evaluation function acts very good in both "testClassic" (average score is 561, and winning rate is 100\%) and "mediumClassic" (average score is 1503.171, 1584,winning rate is 99.8\%, 93.5\% for one ghost and two ghosts respectively).
 	\section{Minimax Agent}
 	\label{sec:Q2}
 	I first generate all the possible next actions that the agent can do, then use "evaluate\_function" to get the score of current action, then find the highest score, and return the action related to that score\\
@@ -35,6 +35,10 @@
 	It is true that usually ghost just random walks, not an adversary who makes optimal decisions and sometimes Minimax agent choose wrong action. That's why we need Expectimax Agent, which will calculate the possibility of every enemy's action and choose the action with highest expect score.\\
 	The code of this agent looks much similar of that in section~\ref{sec:Q2}, the only difference is that instead of return min-value, it will return the average value of all actions.\\
 	This gives "trappedClassic" about 49.2\% winning rate (compares to 0\% of Minimax Agent)
+	\section{Better Evaluation Function}
+	\label{sec:Q5}
+	I use similar method as in section~\ref{sec:Q1}, based on the distance of Pacman to ghosts and Pacman to the nearest food.\\
+	On my computer, in Question5, average score is 1219.9, win rate is 100\% and running time is about 9s, which I think is a considerable good performance.
 	\begin{thebibliography}{1}
 		\bibitem{winning_strategy} 
 		Plambeck, Thane E., and Greg Whitehead. 

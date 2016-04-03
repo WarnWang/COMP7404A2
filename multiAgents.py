@@ -272,10 +272,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Your minimax agent with alpha-beta pruning (question 3)
     """
-
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
-        MultiAgentSearchAgent.__init__(self, evalFn, depth)
-
     def getAction(self, gameState):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
