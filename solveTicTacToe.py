@@ -167,16 +167,24 @@ class GameBoard(object):
 
 
 class TicTacToeGame(object):
-    def __init__(self, board_num=3):
+    def __init__(self, board_num=3, game_state=None):
         """
         init game only support 3 boards currently
         """
-        self.board = []
-        self.board_num = board_num
-        for i in range(board_num):
-            self.board.append(GameBoard())
-        self.player_index = False
-        self.player_name = None
+        if game_state is None:
+            self.board = []
+            self.board_num = board_num
+            for i in range(board_num):
+                self.board.append(GameBoard())
+            self.player_index = False
+            self.player_name = None
+        else:
+            self.board = []
+            self.board_num = game_state.board_num
+            for board in game_state.board:
+                self.board.append(board.copy())
+            self.player_index = game_state.player_index
+            self.player_name = game_state.player_name
 
     def __str__(self):
         """
@@ -226,6 +234,7 @@ class TicTacToeGame(object):
 
         board_index = ord(action[0]) - ord('a')
         self.board[board_index][int(action[1])] = 'X'
+        self.player_index = not self.player_index
 
     def is_finish(self):
         """ Check whether game is finished or not """
@@ -233,6 +242,16 @@ class TicTacToeGame(object):
             if not board.is_dead():
                 return False
         return True
+
+    def get_valid_actions(self):
+        actions = []
+        for i in range(self.board_num):
+            board_index = chr(ord('a') + i)
+            valid_actions = self.board[i].get_valid_actions()
+            for j in valid_actions:
+                actions.append("{}{}".format(board_index, j))
+
+        return actions
 
     def play(self, player1_is_ai=True, player2_is_ai=False):
         """
@@ -257,7 +276,8 @@ class TicTacToeGame(object):
 
             # get player type
             if isinstance(player, AIPlayer):
-                action = player.get_next_action(self.board)
+                # action = player.get_next_action(self.board)
+                action = player.get_action(self)
                 print action.upper()
             else:
                 action = raw_input()
@@ -265,8 +285,6 @@ class TicTacToeGame(object):
                     action = raw_input("Invalid action, please input again: ")
             self.take_action(action)
             print self
-
-            self.player_index = not self.player_index
 
         player = players[int(self.player_index)]
         print "{} wins".format(player)
@@ -280,9 +298,70 @@ class AIPlayer(object):
     def __init__(self, name='AI', depth=1):
         self.__name = name
         self.__depth = depth
+        self.__ai_index = None
 
     def __str__(self):
         return self.__name
+
+    def eval_action(self, game_state):
+        """
+        Eval current game board state
+        :param game_state: current game state
+        :return: the game score of current game board
+        """
+        if game_state.is_finish():
+            if self.__ai_index == game_state.player_index:
+                return int(self.__ai_index)
+            else:
+                return int(not self.__ai_index)
+
+        valid_actions = game_state.get_valid_actions()
+        total_value = 0
+        max_value = int(not self.__ai_index)
+        for action in valid_actions:
+            new_game_state = TicTacToeGame(game_state=game_state)
+            new_game_state.take_action(action)
+            game_score = self.eval_action(new_game_state)
+            if game_state.player_index == self.__ai_index:
+                if isinstance(game_score, int) and bool(game_score) == self.__ai_index:
+                    return int(game_score)
+            total_value += game_score
+            if abs(game_score - int(self.__ai_index)) < abs(max_value - int(self.__ai_index)):
+                max_value = game_score
+
+        if game_state.player_index == self.__ai_index:
+            return max_value
+        else:
+            if total_value == 0 or total_value == len(valid_actions):
+                return total_value / len(valid_actions)
+            else:
+                return float(total_value) / len(valid_actions)
+
+    def get_action(self, game):
+        """
+        Except mac version of tictactoe game
+        :param game: current game state, and TicTacToeGame class
+        :return: valid actions
+        """
+        valid_actions = game.get_valid_actions()
+        target = int(game.player_index)
+        if self.__ai_index is None:
+            self.__ai_index = game.player_index
+
+        min_value = int(not self.__ai_index)
+        opt_action = valid_actions[0]
+        for action in valid_actions:
+            new_game = TicTacToeGame(game_state=game)
+            new_game.take_action(action)
+            game_score = self.eval_action(new_game)
+            if isinstance(game_score, int) and game_score == target:
+                return action
+
+            elif abs(game_score - target) < abs(min_value - target):
+                min_value = game_score
+                opt_action = action
+
+        return opt_action
 
     def get_next_action(self, board, current_player=True, depth=0):
         """
@@ -383,6 +462,7 @@ def merge_state(state):
         return '1'
     else:
         return ''.join(state)
+
 
 if __name__ == "__main__":
     test = TicTacToeGame(3)
