@@ -13,8 +13,8 @@ import random
 import util
 from game import Agent, Directions
 
-MAX_VALUE = 2 ** 16 - 1
-MIN_VALUE = 1 - 2 ** 16
+MAX_VALUE = float("inf")
+MIN_VALUE = float("-inf")
 
 
 class ReflexAgent(Agent):
