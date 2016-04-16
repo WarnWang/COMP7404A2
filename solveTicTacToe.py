@@ -191,19 +191,24 @@ class TicTacToeGame(object):
         Use a string to represent current board
         :return: the board string
         """
+        if self.is_finish():
+            return ""
         string_info = []
+        valid_board = []
         for i in range(self.board_num):
-            character = chr(ord('A') + i)
-            string_info.append('{}:     '.format(character))
+            if not self.board[i].is_dead():
+                valid_board.append(self.board[i])
+                character = chr(ord('A') + i)
+                string_info.append('{}:     '.format(character))
         string_info = ''.join(string_info)
-        row1 = " ".join(self.board[0][:3])
-        row2 = " ".join(self.board[0][3:6])
-        row3 = " ".join(self.board[0][6:9])
+        row1 = " ".join(valid_board[0][:3])
+        row2 = " ".join(valid_board[0][3:6])
+        row3 = " ".join(valid_board[0][6:9])
 
-        for i in range(1, self.board_num):
-            row1 = "{}  {}".format(row1, " ".join(self.board[i][:3]))
-            row2 = "{}  {}".format(row2, " ".join(self.board[i][3:6]))
-            row3 = "{}  {}".format(row3, " ".join(self.board[i][6:9]))
+        for i in range(1, len(valid_board)):
+            row1 = "{}  {}".format(row1, " ".join(valid_board[i][:3]))
+            row2 = "{}  {}".format(row2, " ".join(valid_board[i][3:6]))
+            row3 = "{}  {}".format(row3, " ".join(valid_board[i][6:9]))
 
         return "{}\n{}\n{}\n{}".format(string_info, row1, row2, row3)
 
@@ -277,7 +282,7 @@ class TicTacToeGame(object):
             # get player type
             if isinstance(player, AIPlayer):
                 # action = player.get_next_action(self.board)
-                action = player.get_action(self)
+                action = player.get_next_action(self.board)
                 print action.upper()
             else:
                 action = raw_input()
@@ -302,66 +307,6 @@ class AIPlayer(object):
 
     def __str__(self):
         return self.__name
-
-    def eval_action(self, game_state):
-        """
-        Eval current game board state
-        :param game_state: current game state
-        :return: the game score of current game board
-        """
-        if game_state.is_finish():
-            if self.__ai_index == game_state.player_index:
-                return int(self.__ai_index)
-            else:
-                return int(not self.__ai_index)
-
-        valid_actions = game_state.get_valid_actions()
-        total_value = 0
-        max_value = int(not self.__ai_index)
-        for action in valid_actions:
-            new_game_state = TicTacToeGame(game_state=game_state)
-            new_game_state.take_action(action)
-            game_score = self.eval_action(new_game_state)
-            if game_state.player_index == self.__ai_index:
-                if isinstance(game_score, int) and bool(game_score) == self.__ai_index:
-                    return int(game_score)
-            total_value += game_score
-            if abs(game_score - int(self.__ai_index)) < abs(max_value - int(self.__ai_index)):
-                max_value = game_score
-
-        if game_state.player_index == self.__ai_index:
-            return max_value
-        else:
-            if total_value == 0 or total_value == len(valid_actions):
-                return total_value / len(valid_actions)
-            else:
-                return float(total_value) / len(valid_actions)
-
-    def get_action(self, game):
-        """
-        Except mac version of tictactoe game
-        :param game: current game state, and TicTacToeGame class
-        :return: valid actions
-        """
-        valid_actions = game.get_valid_actions()
-        target = int(game.player_index)
-        if self.__ai_index is None:
-            self.__ai_index = game.player_index
-
-        min_value = int(not self.__ai_index)
-        opt_action = valid_actions[0]
-        for action in valid_actions:
-            new_game = TicTacToeGame(game_state=game)
-            new_game.take_action(action)
-            game_score = self.eval_action(new_game)
-            if isinstance(game_score, int) and game_score == target:
-                return action
-
-            elif abs(game_score - target) < abs(min_value - target):
-                min_value = game_score
-                opt_action = action
-
-        return opt_action
 
     def get_next_action(self, board, current_player=True, depth=0):
         """
