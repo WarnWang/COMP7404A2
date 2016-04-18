@@ -530,24 +530,23 @@ def betterEvaluationFunction(currentGameState):
     food_pos = currentGameState.getFood()
     wall_pos = currentGameState.getWalls()
 
+    min_distance = MAX_VALUE
+
     # Calculate the ghost related score
     for i in range(len(ghost_pos)):
         distance = util.manhattanDistance(pacman_pos, ghost_pos[i])
 
         # which means ghost is eatable
         if ghost_state[i].scaredTimer > 0:
-            current_value += ghost_state[i].scaredTimer - distance
-        else:
+            current_value += (100 / distance) if ghost_state[i].scaredTimer > distance else 0
+        elif distance < min_distance:
+            min_distance = distance
 
-            # This position is very dangerous, so use the minimal value to represent
-            if distance < 2:
-                return MIN_VALUE
-
-            # encourage the agent keep away from ghost, regard distance larger than 5 as safe
-            elif distance > 5:
-                current_value += 5
-            else:
-                current_value += distance
+    # Based on min distance
+    if min_distance < 2:
+        return current_value - 500
+    else:
+        current_value -= 50 / max(min_distance, 5)
 
     # Use BFS to find the nearest food position
     pos_to_explore = []
@@ -569,7 +568,8 @@ def betterEvaluationFunction(currentGameState):
                 if not wall_pos[pos[0]][pos[1]] and pos not in explored_pos:
                     pos_to_explore.append((pos, frontier[1] + 1))
 
-    current_value -= distance
+    # make sure that the nearest get the highest score and will not affect if current point has a food
+    current_value += 6.0 / distance
 
     return current_value
 
