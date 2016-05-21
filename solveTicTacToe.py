@@ -264,6 +264,7 @@ class TicTacToeGame(object):
         :param player1_is_ai: Whether player1 is AI or not
         :param player2_is_ai: Whether player2 is AI or not
         """
+        print
         if player1_is_ai and player2_is_ai:
             players = [AIPlayer('AI1'), AIPlayer('AI2')]
         elif player2_is_ai:
@@ -277,11 +278,13 @@ class TicTacToeGame(object):
         while not self.is_finish():
             player_index = int(self.player_index)
             player = players[player_index]
-            print '{} move:'.format(player),
+            if player == "Your":
+                print "Your move:",
+            else:
+                print "{}:".format(player),
 
             # get player type
             if isinstance(player, AIPlayer):
-                # action = player.get_next_action(self.board)
                 action = player.get_next_action(self.board)
                 print action.upper()
             else:
@@ -289,10 +292,13 @@ class TicTacToeGame(object):
                 while not self.is_valid_action(action):
                     action = raw_input("Invalid action, please input again: ")
             self.take_action(action)
-            print self
+            if not self.is_finish():
+                print self
 
-        player = players[int(self.player_index)]
-        print "{} wins".format(player)
+        player = players[int(not self.player_index)]
+        if player == "Your":
+            player = "You"
+        print "{} LOSE!!!".format(player)
 
 
 class AIPlayer(object):
@@ -410,5 +416,5 @@ def merge_state(state):
 
 
 if __name__ == "__main__":
-    test = TicTacToeGame(3)
-    test.play(player1_is_ai=True, player2_is_ai=False)
+    test = TicTacToeGame(1)
+    test.play(player1_is_ai=True, player2_is_ai=True)
