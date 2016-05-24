@@ -416,5 +416,5 @@ def merge_state(state):
 
 
 if __name__ == "__main__":
-    test = TicTacToeGame(1)
-    test.play(player1_is_ai=True, player2_is_ai=True)
+    test = TicTacToeGame(3)
+    test.play(player1_is_ai=True, player2_is_ai=False)
